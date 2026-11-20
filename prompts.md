@@ -74,3 +74,40 @@ Hãy xây dựng hệ thống Backend Node.js 18+ Express 4 (CommonJS) cho quả
   - *Khắc phục:* Đổi sang `z.coerce.number()`, giúp Zod tự động ép kiểu chuỗi số sang số nguyên một cách an toàn trước khi kiểm tra min/max.
 - **Lỗi 2 (Vi phạm chuẩn HTTP ở API DELETE):** AI viết `res.status(204).json({ message: "Xóa thành công" });`. Theo đặc tả RFC 7231, mã `204 No Content` cấm gửi kèm response body; việc gửi kèm JSON khiến một số client hoặc proxy báo lỗi hoặc bỏ qua body gây lãng phí.
   - *Khắc phục:* Sửa thành `res.status(204).send();` hoàn toàn không có body.
+
+
+---
+
+## TÍNH NĂNG 3: XÂY DỰNG FRONTEND REACT 18 + VITE + AXIOS + CUSTOM HOOK USEBOOKS
+
+### 1. Prompt gửi AI:
+```text
+Hãy xây dựng ứng dụng Frontend React 18 với Vite và Bootstrap 5 cho hệ thống Quản lý Thư viện Sách:
+1. api/axiosClient.js: Cấu hình Axios instance có baseURL từ import.meta.env.VITE_API_URL, tự động trích xuất response.data.
+2. api/bookApi.js & api/categoryApi.js: Các hàm gọi API tương ứng với Backend.
+3. hooks/useBooks.js: Custom Hook quản lý toàn bộ State (books, categories, isLoading, error, searchTerm, isSubmitting, isDeleting):
+   - loadBooks(searchTerm) có cơ chế debounce 400ms.
+   - Thêm/sửa/xóa sách cập nhật State bất biến (immutable update) ngay lập tức, không reload trang.
+   - Trích xuất thông báo lỗi từ error.response.data.error.message.
+4. Các Component:
+   - Navbar.jsx: Tiêu đề, ô tìm kiếm sách ?q=, nút Thêm sách mới.
+   - BookTable.jsx: Bảng hiển thị sách kèm tên thể loại, badge số lượng, nút Sửa, nút Xóa.
+   - BookFormModal.jsx: Modal Thêm/Sửa sách, validate client, hiển thị invalid-feedback.
+   - DeleteConfirmModal.jsx: Modal xác nhận hiển thị tên sách cần xóa, nút Xác nhận đỏ.
+   - LoadingSpinner.jsx, ErrorAlert.jsx, EmptyState.jsx: Xử lý 3 trạng thái giao diện.
+```
+
+### 2. Kết quả AI sinh ra:
+- Tạo đầy đủ cây thư mục Frontend React 18 với giao diện Bootstrap 5 hiện đại, các modal và hook.
+
+### 3. Lỗi AI phát sinh mà tôi tự phát hiện và cách khắc phục:
+- **Lỗi 1 (Đột biến State trực tiếp - State Mutation):** Ban đầu AI viết hàm xóa sách bằng cách:
+  ```javascript
+  const index = books.findIndex(b => b.id === id);
+  books.splice(index, 1);
+  setBooks(books);
+  ```
+  Trong React, cách làm này làm biến đổi trực tiếp mảng `books` gốc mà không đổi tham chiếu (reference pointer) của mảng trong bộ nhớ. React sẽ so sánh nông (`Object.is(prev, next)`) và thấy tham chiếu cũ nên KHÔNG kích hoạt re-render giao diện, khiến dòng sách vẫn còn trơ trơ trên màn hình.
+  - *Khắc phục:* Sửa lại thành cập nhật bất biến (Immutable): `setBooks(prev => prev.filter(b => b.id !== id));`. Mảng mới có địa chỉ vùng nhớ mới, kích hoạt render ngay lập tức.
+- **Lỗi 2 (Hiển thị lỗi chung chung):** Khi API trả về lỗi 400 (do Zod hoặc thể loại không tồn tại), AI chỉ `catch (err) { alert(err.message); }`, hiển thị `"Request failed with status code 400"`.
+  - *Khắc phục:* Tạo component `ErrorAlert.jsx` và bóc tách đúng cấu trúc lỗi do backend quy định: `err.response?.data?.error?.message` và danh sách `details`, giúp thủ thư nhìn thấy rõ ràng lỗi tiếng Việt cụ thể.
