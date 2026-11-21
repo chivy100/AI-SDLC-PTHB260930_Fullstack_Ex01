@@ -4,6 +4,9 @@
 -- Storage Engine: InnoDB (hỗ trợ Transaction và Foreign Key Constraints)
 -- ==============================================================================
 
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
 -- 1. Khởi tạo Cơ sở dữ liệu
 CREATE DATABASE IF NOT EXISTS `library_db` 
 CHARACTER SET utf8mb4 

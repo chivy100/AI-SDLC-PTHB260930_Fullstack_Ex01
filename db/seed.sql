@@ -3,6 +3,7 @@
 -- Dữ liệu mẫu tiếng Việt có dấu chuẩn UTF-8
 -- ==============================================================================
 
+SET NAMES utf8mb4;
 USE `library_db`;
 
 -- 1. Nạp dữ liệu mẫu cho bảng categories (4 thể loại phổ biến)
